@@ -9,6 +9,7 @@ int PyArg_ParseTuple_S(PyObject *, char **);
 import "C"
 
 import (
+	"encoding/base64"
 	"fmt"
 	"image"
 	"image/color"
@@ -32,9 +33,9 @@ func init() {
 	dominantColor = dominantcolor.NewDefault()
 }
 
-// FromImage returns the dominant color (HEX format) of a given imageURI
-//export FromImage
-func FromImage(self, args *C.PyObject) *C.PyObject {
+// FromImageURI returns the dominant color (HEX format) of a given imageURI
+//export FromImageURI
+func FromImageURI(self, args *C.PyObject) *C.PyObject {
 	var cImageURI *C.char
 	if C.PyArg_ParseTuple_S(args, &cImageURI) == 0 {
 		return C.PyString_FromString(C.CString(""))
@@ -49,6 +50,26 @@ func FromImage(self, args *C.PyObject) *C.PyObject {
 	}
 
 	image, _, err := image.Decode(file)
+	if err != nil {
+		return C.PyString_FromString(C.CString(""))
+	}
+
+	dominantColor := dominantColor.FromImage(image)
+	hexColor := rgbaToHex(&dominantColor)
+	return C.PyString_FromString(C.CString(hexColor))
+}
+
+// FromBase64Image returns the dominant color (HEX format) of a given imageURI
+//export FromBase64Image
+func FromBase64Image(self, args *C.PyObject) *C.PyObject {
+	var cBase64Image *C.char
+	if C.PyArg_ParseTuple_S(args, &cBase64Image) == 0 {
+		return C.PyString_FromString(C.CString(""))
+	}
+
+	base64Image := C.GoString(cBase64Image)
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64Image))
+	image, _, err := image.Decode(reader)
 	if err != nil {
 		return C.PyString_FromString(C.CString(""))
 	}

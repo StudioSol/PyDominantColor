@@ -1,7 +1,8 @@
 #define Py_LIMITED_API
 #include <Python.h>
 
-PyObject * FromImage(PyObject *, PyObject *);
+PyObject * FromImageURI(PyObject *, PyObject *);
+PyObject * FromBase64Image(PyObject *, PyObject *);
 
 // Workaround missing variadic function support
 // https://github.com/golang/go/issues/975
@@ -10,7 +11,8 @@ int PyArg_ParseTuple_S(PyObject * args, char ** s) {
 }
 
 static PyMethodDef DominantColorMethods[] = {
-    {"FromImage", FromImage, METH_VARARGS, "Given an image file URI it returns the dominant color of the image."},
+    {"FromImageURI", FromImageURI, METH_VARARGS, "Given an image file URI it returns the dominant color of the image."},
+    {"FromBase64Image", FromBase64Image, METH_VARARGS, "Given an image base64 string it returns the dominant color of the image."},
     {NULL, NULL, 0, NULL}
 };
 
