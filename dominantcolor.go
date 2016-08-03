@@ -59,7 +59,7 @@ func FromImageURI(self, args *C.PyObject) *C.PyObject {
 	return C.PyString_FromString(C.CString(hexColor))
 }
 
-// FromBase64Image returns the dominant color (HEX format) of a given imageURI
+// FromBase64Image returns the dominant color (HEX format) of the given base64 image
 //export FromBase64Image
 func FromBase64Image(self, args *C.PyObject) *C.PyObject {
 	var cBase64Image *C.char
