@@ -2,10 +2,10 @@
 	"version": 0,
 	"dependencies": [
 		{
-			"importpath": "github.com/brunomvsouza/dominantcolor",
-			"repository": "https://github.com/brunomvsouza/dominantcolor",
+			"importpath": "github.com/RobCherry/vibrant",
+			"repository": "https://github.com/RobCherry/vibrant",
 			"vcs": "git",
-			"revision": "ddad320f3e04bba9a22d4b12644c8da5d83f5339",
+			"revision": "0680b8cf1c899723ebac8f11c6a18d40011098e1",
 			"branch": "master",
 			"notests": true
 		},
@@ -24,6 +24,24 @@
 			"revision": "c348254d65821a0aaca538bf5e7774bb522c1dec",
 			"branch": "master",
 			"path": "/bmp",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/image/draw",
+			"repository": "https://go.googlesource.com/image",
+			"vcs": "git",
+			"revision": "1ff62c92167a10494f3e0b1e77cb67860a6ac43a",
+			"branch": "master",
+			"path": "/draw",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/image/math/f64",
+			"repository": "https://go.googlesource.com/image",
+			"vcs": "git",
+			"revision": "1ff62c92167a10494f3e0b1e77cb67860a6ac43a",
+			"branch": "master",
+			"path": "math/f64",
 			"notests": true
 		},
 		{

@@ -24,14 +24,9 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/brunomvsouza/dominantcolor"
+	"github.com/RobCherry/vibrant"
 )
 
-var dominantColor *dominantcolor.DominantColor
-
-func init() {
-	dominantColor = dominantcolor.NewDefault()
-}
 
 // FromImageURI returns the dominant color (HEX format) of a given imageURI
 //export FromImageURI
@@ -54,8 +49,14 @@ func FromImageURI(self, args *C.PyObject) *C.PyObject {
 		return C.PyString_FromString(C.CString(""))
 	}
 
-	dominantColor := dominantColor.FromImage(image)
-	hexColor := rgbaToHex(&dominantColor)
+	ri, gi, bi, ai := vibrant.NewPaletteBuilder(image).Generate().VibrantSwatch().Color().RGBA()
+
+	hexColor := rgbaToHex(&color.RGBA{
+		uint8(ri / 255),
+		uint8(gi / 255),
+		uint8(bi / 255),
+		uint8(ai / 255),
+	})
 	return C.PyString_FromString(C.CString(hexColor))
 }
 
@@ -74,9 +75,24 @@ func FromBase64Image(self, args *C.PyObject) *C.PyObject {
 		return C.PyString_FromString(C.CString(""))
 	}
 
-	dominantColor := dominantColor.FromImage(image)
-	hexColor := rgbaToHex(&dominantColor)
-	return C.PyString_FromString(C.CString(hexColor))
+
+	if paletteBuilder := vibrant.NewPaletteBuilder(image); paletteBuilder != nil {
+		if generate := paletteBuilder.Generate(); generate != nil {
+			if palette := generate.VibrantSwatch(); palette != nil {
+				ri, gi, bi, ai := palette.Color().RGBA()
+				hexColor := rgbaToHex(&color.RGBA{
+					uint8(ri / 255),
+					uint8(gi / 255),
+					uint8(bi / 255),
+					uint8(ai / 255),
+				})
+				return C.PyString_FromString(C.CString(hexColor))
+			}
+		}
+	}
+
+	return C.PyString_FromString(C.CString(""))
+
 }
 
 // rgbaToHex returns the correspondent HEX code for a given color.RGBA color
