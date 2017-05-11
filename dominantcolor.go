@@ -16,6 +16,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"io"
 	"os"
 	"strings"
 
@@ -26,7 +27,6 @@ import (
 
 	"github.com/RobCherry/vibrant"
 )
-
 
 // FromImageURI returns the dominant color (HEX format) of a given imageURI
 //export FromImageURI
@@ -44,37 +44,14 @@ func FromImageURI(self, args *C.PyObject) *C.PyObject {
 		return C.PyString_FromString(C.CString(""))
 	}
 
+	return fromFile(file)
+}
+
+func fromFile(file io.Reader) *C.PyObject {
 	image, _, err := image.Decode(file)
 	if err != nil {
 		return C.PyString_FromString(C.CString(""))
 	}
-
-	ri, gi, bi, ai := vibrant.NewPaletteBuilder(image).Generate().VibrantSwatch().Color().RGBA()
-
-	hexColor := rgbaToHex(&color.RGBA{
-		uint8(ri / 255),
-		uint8(gi / 255),
-		uint8(bi / 255),
-		uint8(ai / 255),
-	})
-	return C.PyString_FromString(C.CString(hexColor))
-}
-
-// FromBase64Image returns the dominant color (HEX format) of the given base64 image
-//export FromBase64Image
-func FromBase64Image(self, args *C.PyObject) *C.PyObject {
-	var cBase64Image *C.char
-	if C.PyArg_ParseTuple_S(args, &cBase64Image) == 0 {
-		return C.PyString_FromString(C.CString(""))
-	}
-
-	base64Image := C.GoString(cBase64Image)
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64Image))
-	image, _, err := image.Decode(reader)
-	if err != nil {
-		return C.PyString_FromString(C.CString(""))
-	}
-
 
 	if paletteBuilder := vibrant.NewPaletteBuilder(image); paletteBuilder != nil {
 		if generate := paletteBuilder.Generate(); generate != nil {
@@ -92,7 +69,20 @@ func FromBase64Image(self, args *C.PyObject) *C.PyObject {
 	}
 
 	return C.PyString_FromString(C.CString(""))
+}
 
+// FromBase64Image returns the dominant color (HEX format) of the given base64 image
+//export FromBase64Image
+func FromBase64Image(self, args *C.PyObject) *C.PyObject {
+	var cBase64Image *C.char
+	if C.PyArg_ParseTuple_S(args, &cBase64Image) == 0 {
+		return C.PyString_FromString(C.CString(""))
+	}
+
+	base64Image := C.GoString(cBase64Image)
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64Image))
+
+	return fromFile(reader)
 }
 
 // rgbaToHex returns the correspondent HEX code for a given color.RGBA color
